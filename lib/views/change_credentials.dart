@@ -87,6 +87,7 @@ class _CredentialsState extends State<Credentials> {
                 width: 150,
                 height: 40,
                 child: TextField(
+                  obscureText: true,
                   onChanged: (var value) {
                     setState(() {
                       pass = value;

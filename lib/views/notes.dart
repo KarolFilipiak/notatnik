@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Notepad extends StatefulWidget {
 
@@ -129,6 +131,15 @@ class _NotepadState extends State<Notepad> {
                           notepadTextControl.text = notepad;
                         });
                         //print(notepad);
+
+                        showTopSnackBar(
+                          context,
+                          CustomSnackBar.info(
+                            message:
+                                "Note saved successfully",
+                            backgroundColor: Colors.greenAccent,
+                            ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
 

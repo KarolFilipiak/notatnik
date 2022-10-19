@@ -120,6 +120,7 @@ class _WelcomeState extends State<Welcome> {
                 width: 150,
                 height: 40,
                 child: TextField(
+                  obscureText: true,
                   onChanged: (var value) {
                     setState(() {
                       pass = value;
