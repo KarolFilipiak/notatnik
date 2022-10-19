@@ -16,12 +16,17 @@ class _NotepadState extends State<Notepad> {
   final _storage = const FlutterSecureStorage();
   String notepad = '';
   String login = '';
-  bool _isLoading = true;
+  bool _isLoading1 = true;
+  bool _isLoading2 = true;
 
   void getlogin() async {
     if (await _storage.containsKey(key: "login")) {
       login = (await _storage.read(key: "login"))!;
     }
+
+    setState(() {
+      _isLoading1 = false;
+    });
     
   }
 
@@ -30,6 +35,7 @@ class _NotepadState extends State<Notepad> {
       notepad = decode((await _storage.read(key: "notes"))!);
     setState(() {
       notepadTextControl.text = notepad;
+      _isLoading2 = false;
     });
   }
 
@@ -53,9 +59,7 @@ class _NotepadState extends State<Notepad> {
     getlogin();
     getnotes();
 
-    setState(() {
-      _isLoading = false;
-    });
+    
   }
 
   @override
@@ -78,7 +82,7 @@ class _NotepadState extends State<Notepad> {
         backgroundColor: Color.fromARGB(255, 89, 7, 121),
       ),
       backgroundColor: Color.fromARGB(255, 224, 157, 245),
-      body:  _isLoading 
+      body:  (_isLoading1 || _isLoading2) 
         ? Center(
             child: CircularProgressIndicator(),
           )
