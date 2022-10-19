@@ -48,7 +48,21 @@ class _CredentialsState extends State<Credentials> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Change your credentials here and press the button to save changes", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color.fromARGB(255, 125, 125, 125))),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Text(
+                "Change your credentials here and press the button to save changes", 
+                maxLines: null,
+                style: TextStyle(
+                  fontWeight: 
+                  FontWeight.bold, fontSize: 20, 
+                  color: Color.fromARGB(255, 125, 125, 125)
+                )
+              ),
+            ),
+            const SizedBox(
+                height: 20,
+            ),
             SizedBox(
                 width: 150,
                 height: 40,
@@ -68,6 +82,7 @@ class _CredentialsState extends State<Credentials> {
                   controller: loginTextControl,
                 ),
               ),
+              SizedBox(height: 5,),
               SizedBox(
                 width: 150,
                 height: 40,
@@ -154,7 +169,10 @@ class _CredentialsState extends State<Credentials> {
                             ),
                         );
                       }
-                    }, 
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color.fromARGB(255, 241, 69, 247),
+                    ), 
                     child: const Text('CHANGE CREDENTIALS')
                   ),
           ],
