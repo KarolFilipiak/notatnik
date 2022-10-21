@@ -90,6 +90,7 @@ class _WelcomeState extends State<Welcome> {
                 child: Text(
                   'Welcome! Please input your login and password and press one of the buttons to continue', 
                   maxLines: null,
+                  textAlign: TextAlign.center,
                 ),
               ),
 

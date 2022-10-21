@@ -53,6 +53,7 @@ class _CredentialsState extends State<Credentials> {
               child: Text(
                 "Change your credentials here and press the button to save changes", 
                 maxLines: null,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: 
                   FontWeight.bold, fontSize: 20, 
