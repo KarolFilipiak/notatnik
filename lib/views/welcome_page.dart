@@ -53,6 +53,22 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
+  Future<bool> checkData() async {
+    if (debug) {
+      print("CHECKED HASH: ${await _storage.read(key: 'hash')}");
+    }
+    setState(() {                  
+    });
+
+    if (await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty)) {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,9 +202,9 @@ class _WelcomeState extends State<Welcome> {
                       else {
 
                         final bool verification = await verifyCredentials(login, pass);
+                        final bool hasHash = await checkData();
                         
-                        
-                        if(verification){
+                        if(verification && hasHash){
                           setState(()  {  
                               loginTextControl.clear();
                               passwordTextControl.clear();
@@ -202,6 +218,16 @@ class _WelcomeState extends State<Welcome> {
                               );
                             }
                           );
+                          }
+                          else if (!hasHash){
+                            showTopSnackBar(
+                            context,
+                            CustomSnackBar.info(
+                              message:
+                                  "Change your credentials first",
+                              backgroundColor: Colors.redAccent,
+                            ),
+                            );
                           }
                           else {
                             showTopSnackBar(
@@ -242,82 +268,105 @@ class _WelcomeState extends State<Welcome> {
               ),
               SizedBox(height: MediaQuery.of(context).size.height*0.001),
               ElevatedButton(
-                    onPressed: () async {
-                      if(login.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type your login",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
-                      }
-                      else if (login.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Login consists of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
-                      }
-                      else if (pass.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type your password",
-                            backgroundColor: Colors.redAccent,
+                  onPressed: () async {
+                    if(login.isEmpty) {
+                      showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Please type your login",
+                          backgroundColor: Colors.redAccent,
                           ),
-                        );
-                      }
-                      else if (pass.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Password consists of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
+                      );
+                    }
+                    else if (login.length < 2) {
+                      showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Login consists of at least 2 letters",
+                          backgroundColor: Colors.redAccent,
+                          ),
+                      );
+                    }
+                    else if (pass.isEmpty) {
+                      showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Please type your password",
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    }
+                    else if (pass.length < 2) {
+                      showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Password consists of at least 2 letters",
+                          backgroundColor: Colors.redAccent,
+                          ),
+                      );
+                    }
+                    else {
+                      final bool verification = await verifyCredentials(login, pass);
+                      
+                      if(verification){
+                        setState(()  {
+                          String l = login;
+                          loginTextControl.clear();
+                          passwordTextControl.clear();
+                          login = '';
+                          pass = '';
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => Credentials(curr_hash: l,),
+                            )
+                            
+                          );
+                        });
                       }
                       else {
-                        final bool verification = await verifyCredentials(login, pass);
-                        
-                        if(verification){
-                          setState(()  {
-                            String l = login;
-                            loginTextControl.clear();
-                            passwordTextControl.clear();
-                            login = '';
-                            pass = '';
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => Credentials(curr_hash: l,),
-                              )
-                              
-                            );
-                          });
-                        }
-                        else {
-                          showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Wrong credentials",
-                            backgroundColor: Colors.redAccent,
-                          ),
-                          );
-                        }
+                        showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Wrong credentials",
+                          backgroundColor: Colors.redAccent,
+                        ),
+                        );
                       }
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      primary: const Color.fromARGB(255, 241, 69, 247),
-                    ),
-                    child: const Text('CHANGE PASSWORD')
+                    }
+                  }, 
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color.fromARGB(255, 241, 69, 247),
+                  ),
+                  child: const Text('CHANGE PASSWORD')
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height*0.001),
+                ElevatedButton(
+                  onPressed: () async {
+                    _storage.deleteAll();
+                    showTopSnackBar(
+                        context,
+                        CustomSnackBar.info(
+                          message:
+                              "Data erased",
+                          backgroundColor: Color.fromARGB(255, 245, 4, 4),
+                      ),
+                    );
+                    setState(() {
+                      loginTextControl.clear();
+                      passwordTextControl.clear();
+                      login = '';
+                      pass = '';
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromARGB(255, 240, 8, 8),
+                  ),
+                  child: const Text('RESET DATA'))
             ]
             ),
           )
