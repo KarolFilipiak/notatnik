@@ -8,6 +8,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:notatnik/views/notes.dart';
 import 'package:notatnik/views/change_credentials.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:notatnik/functions.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
@@ -24,6 +25,16 @@ class _WelcomeState extends State<Welcome> {
   String pass = '';
   bool debug = false;
 
+  void clear_input()
+  {
+    setState(()  {
+      loginTextControl.clear();
+      passwordTextControl.clear();
+      login = '';
+      pass = '';
+    });
+  }
+
   Future<bool> verifyCredentials(String log, String pas) async {
     String digest = '';
     String fromStorage = '';
@@ -32,6 +43,7 @@ class _WelcomeState extends State<Welcome> {
     
     if (await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty)) {
       digest = sha256.convert(bytes).toString();
+      digest = await F.stretch(digest,0);
       fromStorage = (await _storage.read(key: "hash"))!;
     }
 
@@ -239,10 +251,7 @@ class _WelcomeState extends State<Welcome> {
                             ),
                             );
                           }
-                        
-
                       }
-
                     }, 
                     style: ElevatedButton.styleFrom(
                       primary: const Color.fromARGB(255, 241, 69, 247),
@@ -252,12 +261,13 @@ class _WelcomeState extends State<Welcome> {
                   SizedBox(width: MediaQuery.of(context).size.width*0.02),
                   ElevatedButton(
                     onPressed: () async {
-                      setState(() {
-                        loginTextControl.clear();
-                        passwordTextControl.clear();
-                        login = '';
-                        pass = '';
-                      });
+                      // setState(() {
+                      //   loginTextControl.clear();
+                      //   passwordTextControl.clear();
+                      //   login = '';
+                      //   pass = '';
+                      // });
+                      clear_input();
                     }, 
                     style: ElevatedButton.styleFrom(
                       primary: const Color.fromARGB(255, 241, 69, 247),
@@ -356,12 +366,7 @@ class _WelcomeState extends State<Welcome> {
                           backgroundColor: Color.fromARGB(255, 245, 4, 4),
                       ),
                     );
-                    setState(() {
-                      loginTextControl.clear();
-                      passwordTextControl.clear();
-                      login = '';
-                      pass = '';
-                    });
+                    clear_input();
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 240, 8, 8),

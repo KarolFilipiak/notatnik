@@ -22,6 +22,14 @@ class _NotepadState extends State<Notepad> {
   bool _isLoading1 = true;
   bool _isLoading2 = true;
 
+  void clear_input()
+  {
+    setState(()  {
+      notepadTextControl.clear();
+      notepad = '';
+    });
+  }
+
   void getlogin() async {
     if (await _storage.containsKey(key: "login")) {
       login = (await _storage.read(key: "login"))!;
@@ -43,7 +51,6 @@ class _NotepadState extends State<Notepad> {
   }
 
   Future decode(final ciphertext) async{
-    //String plaintext = '';
     print("decode_in: ${ciphertext}");
     if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "KEY") && ((await _storage.read(key: "KEY"))!.isNotEmpty) && (ciphertext != ''))
     {
@@ -68,9 +75,6 @@ class _NotepadState extends State<Notepad> {
       print("decode_nocode");
       return '';
     }
-    //if (ciphertext.isNotEmpty)
-    //  plaintext = ciphertext + ''; //TODO: deszyfracja szyfrogramu
-    //return plaintext;
   }
 
   Future encode(String plaintext) async {
@@ -95,10 +99,6 @@ class _NotepadState extends State<Notepad> {
       print("encode_nocode");
       return '';
     }
-    // String ciphertext = '';
-    // if (plaintext.isNotEmpty)
-    //   ciphertext = plaintext + '';  //TODO: szyfracja tekstu jawnego
-    // return ciphertext;
   }
 
   @override
@@ -210,10 +210,7 @@ class _NotepadState extends State<Notepad> {
                     SizedBox(width: MediaQuery.of(context).size.width*0.01),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          notepadTextControl.clear();
-                          notepad = '';
-                        });
+                        clear_input();
                       }, 
                       style: ElevatedButton.styleFrom(
 
@@ -221,9 +218,7 @@ class _NotepadState extends State<Notepad> {
                       ),
                       child: const Text('CLEAR', style: TextStyle(color: Color.fromARGB(200, 255, 255, 255)))
                     )
-                    
-                    
-                    
+
                   ],
                 ),
             ],

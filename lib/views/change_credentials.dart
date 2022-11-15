@@ -9,12 +9,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:encrypt/encrypt.dart' as enc;
+import 'package:notatnik/functions.dart';
 
 import 'package:flutter/foundation.dart';
 import 'dart:convert' as convert;
 import 'dart:math';
 import 'package:pointycastle/pointycastle.dart';
 import 'package:notatnik/encrypted.dart';
+import 'package:cryptography/cryptography.dart' as cry;
 
 class Credentials extends StatefulWidget {
   final String curr_hash;
@@ -32,10 +34,14 @@ class _CredentialsState extends State<Credentials> {
   String login = '';
   String pass = '';
   
-
-  static Uint8List secureRandom(int length) {
-    return Uint8List.fromList(
-        List.generate(length, (i) => Random.secure().nextInt(256)));
+  void clear_input()
+  {
+    setState(()  {
+      loginTextControl.clear();
+      passwordTextControl.clear();
+      login = '';
+      pass = '';
+    });
   }
 
   Future<String> decryptWithHash (final toDecrypt, String hash) async {
@@ -90,7 +96,7 @@ class _CredentialsState extends State<Credentials> {
     
     // await _storage.write(key: 'SALT', value: convert.base64.encode(salt));
 
-    final key = enc.Key.fromBase16(hash);
+    final key = enc.Key.fromBase64(hash);
     final iv = enc.IV.fromSecureRandom(16);
     final macValue = Uint8List.fromList(utf8.encode(hash));
 
@@ -265,7 +271,10 @@ class _CredentialsState extends State<Credentials> {
                         String digest = sha256.convert(bytes).toString();
                         print("Digest as hex string: $digest");
 
+                        digest = await F.stretch(digest,1);
+                        print("Stretched: ${digest}");
                         await _storage.write(key: 'hash', value: digest);
+
 
                         if (note != '')
                         {
@@ -273,25 +282,18 @@ class _CredentialsState extends State<Credentials> {
                         }
                         else 
                         {
-                          final key = enc.Key.fromBase16(digest);
-                          final iv = enc.IV.fromSecureRandom(16);
+                          // final key = enc.Key.fromBase64(digest);
+                          // final iv = enc.IV.fromSecureRandom(16);
 
-                          await _storage.write(key: 'IV', value: iv.base64);
-                          await _storage.write(key: 'KEY', value: key.base64);
+                          // await _storage.write(key: 'IV', value: iv.base64);
+                          // await _storage.write(key: 'KEY', value: key.base64);
 
-                          print(key.length);
+                          // print(key.length);
+                          F.generateIvKey(digest);
 
                         }
                         
-                        
-
-                        setState(()  {
-                            loginTextControl.clear();
-                            passwordTextControl.clear();
-                            login = '';
-                            pass = '';
-                          }
-                        );
+                        clear_input();
 
                         showTopSnackBar(
                           context,
