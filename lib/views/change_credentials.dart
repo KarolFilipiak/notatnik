@@ -3,20 +3,14 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:notatnik/functions.dart';
 
-import 'package:flutter/foundation.dart';
 import 'dart:convert' as convert;
 import 'dart:math';
-import 'package:pointycastle/pointycastle.dart';
-import 'package:notatnik/encrypted.dart';
-import 'package:cryptography/cryptography.dart' as cry;
 
 class Credentials extends StatefulWidget {
   final String curr_hash;
@@ -72,30 +66,6 @@ class _CredentialsState extends State<Credentials> {
   }
 
   Future<void> encryptWithHash(String toEncrypt, String hash) async {
-    // final salt = secureRandom(32);
-    // final hashPassword = hash;
-
-    // final key = secureRandom(32);
-    // final iv = secureRandom(12);
-
-    // final encrypter = enc.Encrypter(AES(key));
-
-    // String note = '';
-
-    // Encrypted encrypted = Encrypted(
-    //     salt: convert.base64.encode(salt),
-    //     iv: convert.base64.encode(iv),
-    //     note: Encryption.encryptChaCha20Poly1305(
-    //         'Enter your message', key, iv));
-    
-    // await _storage.write(key: 'data', value: Encrypted.serialize(encrypted));
-    
-    // await _storage.write(key: 'IV', value: convert.base64.encode(iv));
-    
-    // await _storage.write(key: 'KEY', value: convert.base64.encode(key));
-    
-    // await _storage.write(key: 'SALT', value: convert.base64.encode(salt));
-
     final key = enc.Key.fromBase64(hash);
     final iv = enc.IV.fromSecureRandom(16);
     final macValue = Uint8List.fromList(utf8.encode(hash));
@@ -110,22 +80,6 @@ class _CredentialsState extends State<Credentials> {
     await _storage.write(key: 'IV', value: iv.base64);
     await _storage.write(key: 'KEY', value: key.base64);
     await _storage.write(key: 'notes', value: encrypted.base64);
-    
-  }
-
-
-  String decode(String ciphertext){
-    String plaintext = '';
-    if (ciphertext.isNotEmpty)
-      plaintext = ciphertext + ''; //TODO: deszyfracja szyfrogramu
-    return plaintext;
-  }
-
-  String encode(String plaintext){
-    String ciphertext = '';
-    if (plaintext.isNotEmpty)
-      ciphertext = plaintext + '';  //TODO: szyfracja tekstu jawnego
-    return ciphertext;
   }
 
   @override
