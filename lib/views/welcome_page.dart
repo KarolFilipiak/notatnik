@@ -39,11 +39,9 @@ class _WelcomeState extends State<Welcome> {
     String digest = '';
     String fromStorage = '';
 
-    var bytes = utf8.encode(login[0]+pass+login+pass[1]); // data being hashed
     
     if (await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty)) {
-      digest = sha256.convert(bytes).toString();
-      digest = await F.stretch(digest,0);
+      digest = await F.makeHash(login, pass);
       fromStorage = (await _storage.read(key: "hash"))!;
     }
 
@@ -215,16 +213,15 @@ class _WelcomeState extends State<Welcome> {
 
                         final bool verification = await verifyCredentials(login, pass);
                         final bool hasHash = await checkData();
+                        //final bool hasHash = await F.hasNote();
                         
-                        if(verification && hasHash){
+                        if(hasHash && verification){
+                          String hashed = await F.makeHash(login,pass);
+                          clear_input();
                           setState(()  {  
-                              loginTextControl.clear();
-                              passwordTextControl.clear();
-                              login = '';
-                              pass = '';
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => Notepad(),
+                                  builder: (context) => Notepad(curr_hash: hashed,),
                                 )
                                 
                               );
@@ -323,15 +320,13 @@ class _WelcomeState extends State<Welcome> {
                       final bool verification = await verifyCredentials(login, pass);
                       
                       if(verification){
+                        String hashed = await F.makeHash(login,pass);
+                        clear_input();
                         setState(()  {
                           String l = login;
-                          loginTextControl.clear();
-                          passwordTextControl.clear();
-                          login = '';
-                          pass = '';
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => Credentials(curr_hash: l,),
+                              builder: (context) => Credentials(curr_hash: hashed),
                             )
                             
                           );

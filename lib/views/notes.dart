@@ -5,10 +5,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:encrypt/encrypt.dart' as enc;
+import 'package:notatnik/functions.dart';
 
 class Notepad extends StatefulWidget {
+  final String curr_hash;
 
-  const Notepad({Key? key}) : super(key: key);
+  const Notepad({Key? key, required String this.curr_hash}) : super(key: key);
 
   @override
   State<Notepad> createState() => _NotepadState();
@@ -21,6 +23,7 @@ class _NotepadState extends State<Notepad> {
   String login = '';
   bool _isLoading1 = true;
   bool _isLoading2 = true;
+  String hash = '';
 
   void clear_input()
   {
@@ -42,77 +45,28 @@ class _NotepadState extends State<Notepad> {
   }
 
   void getnotes() async {
+    setState(() {
+      hash = widget.curr_hash;
+    });
     if(await _storage.containsKey(key: "notes"))
-      notepad = await decode((await _storage.read(key: "notes"))!);
+      notepad = await F.decryptWithHash((await _storage.read(key: "notes"))!,hash);
     setState(() {
       notepadTextControl.text = notepad;
       _isLoading2 = false;
     });
   }
 
-  Future decode(final ciphertext) async{
-    print("decode_in: ${ciphertext}");
-    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "KEY") && ((await _storage.read(key: "KEY"))!.isNotEmpty) && (ciphertext != ''))
-    {
-      final iv_in = (await _storage.read(key: "IV"))!;
-      final iv = enc.IV.fromBase64(iv_in);
-      print("decode_code");
-
-      final key_in = (await _storage.read(key: "KEY"))!;
-      final key = enc.Key.fromBase64(key_in);
-
-      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
-      final encrypted = enc.Encrypted.fromBase64(ciphertext);
-
-
-      final decrypted = encrypter.decrypt(encrypted, iv: iv);
-
-      return decrypted;
-
-    }
-    else
-    {
-      print("decode_nocode");
-      return '';
-    }
-  }
-
-  Future encode(String plaintext) async {
-    print("encode_in");
-    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "KEY") && ((await _storage.read(key: "KEY"))!.isNotEmpty) && (plaintext != ''))
-    {
-      final iv_in = (await _storage.read(key: "IV"))!;
-      final iv = enc.IV.fromBase64(iv_in);
-    
-      print("encode_code");
-      final key_in = (await _storage.read(key: "KEY"))!;
-      final key = enc.Key.fromBase64(key_in);
-
-      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
-
-      final encrypted = encrypter.encrypt(plaintext, iv: iv);
-
-      return encrypted.base64;
-    }
-    else
-    {
-      print("encode_nocode");
-      return '';
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     getlogin();
-    getnotes();
-
-    
+    getnotes();    
   }
 
   @override
   Widget build(BuildContext context) {
-
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -171,9 +125,8 @@ class _NotepadState extends State<Notepad> {
                     TextButton(
                       
                       onPressed: () async {
-                        notepad = await encode(notepad);
-                        _storage.write(key: "notes", value: notepad);
-                        notepad = await decode(notepad);
+                        notepad = await F.encryptWithHash(notepad,hash);
+                        notepad = await F.decryptWithHash(notepad,hash);
                         setState(() {
                           notepadTextControl.text = notepad;
                         });

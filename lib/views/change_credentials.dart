@@ -27,7 +27,14 @@ class _CredentialsState extends State<Credentials> {
   final _storage = const FlutterSecureStorage();
   String login = '';
   String pass = '';
+  String hash = '';
   
+  @override
+  void initState() {
+    super.initState();
+    hash = widget.curr_hash;
+  }
+
   void clear_input()
   {
     setState(()  {
@@ -78,7 +85,6 @@ class _CredentialsState extends State<Credentials> {
     print("Key: ${key.base64}");
 
     await _storage.write(key: 'IV', value: iv.base64);
-    await _storage.write(key: 'KEY', value: key.base64);
     await _storage.write(key: 'notes', value: encrypted.base64);
   }
 
@@ -207,44 +213,29 @@ class _CredentialsState extends State<Credentials> {
                       }
                       else {
                         String note = '';
-                        String hash = '';
                         
                         
-                        if(await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty) && ((await _storage.read(key: "hash"))! != ''))
-                        {
-                          hash = (await _storage.read(key: "hash"))!;
-                        }
-                        
-                        if (await _storage.containsKey(key: "notes") && ((await _storage.read(key: "notes"))!.isNotEmpty) && ((await _storage.read(key: "notes"))! != '') && await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty) && ((await _storage.read(key: "hash"))! != ''))
+                        if (await _storage.containsKey(key: "notes") && ((await _storage.read(key: "notes"))!.isNotEmpty) && ((await _storage.read(key: "notes"))! != ''))
                         {
                           note = (await _storage.read(key: "notes"))!;
-                          note = await decryptWithHash(note,hash);
+                          note = await F.decryptWithHash(note,hash);
                         }
 
-                        var bytes = utf8.encode(login[0]+pass+login+pass[1]); // data being hashed
-                        String digest = sha256.convert(bytes).toString();
-                        print("Digest as hex string: $digest");
-
-                        digest = await F.stretch(digest,1);
+                        String digest = await F.makeHash1(login, pass);
                         print("Stretched: ${digest}");
                         await _storage.write(key: 'hash', value: digest);
+                        setState(() {
+                          hash = digest;
+                        });
 
 
                         if (note != '')
                         {
-                          await encryptWithHash(note, digest);
+                          await F.encryptWithHash(note, digest);
                         }
                         else 
                         {
-                          // final key = enc.Key.fromBase64(digest);
-                          // final iv = enc.IV.fromSecureRandom(16);
-
-                          // await _storage.write(key: 'IV', value: iv.base64);
-                          // await _storage.write(key: 'KEY', value: key.base64);
-
-                          // print(key.length);
-                          F.generateIvKey(digest);
-
+                          F.generateIv();
                         }
                         
                         clear_input();
