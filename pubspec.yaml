@@ -41,6 +41,7 @@ dependencies:
   pointycastle: ^3.6.2
   encrypt: ^5.0.1
   cryptography: ^2.0.5
+  flutter_locker: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,7 @@ flutter_icons:
   android: true
   ios: true
   image_path: "icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  min_sdk_android: 24 # android min sdk min:16, default 21
   web:
     generate: true
     image_path: "icon.png"

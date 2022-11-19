@@ -1,14 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:crypto/crypto.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:notatnik/views/notes.dart';
+import 'package:notatnik/views/notes_fingerprint.dart';
 import 'package:notatnik/views/change_credentials.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:notatnik/functions.dart';
+import 'package:flutter_locker/flutter_locker.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
@@ -79,6 +79,61 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
+  Future<bool> _canAuthenticate() async {
+    try {
+      final canAuthenticate = await FlutterLocker.canAuthenticate();
+      return canAuthenticate!;
+    }
+    catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _getToFingernotes() async {
+    try {
+      await FlutterLocker.save(SaveSecretRequest(
+            key: 'checkfinger', 
+            secret: 'x', 
+            androidPrompt: AndroidPrompt(
+                  title: 'Authenticate',
+                  cancelLabel: 'Cancel',
+                  descriptionLabel: 'Please authenticate to save note')
+          ),);
+
+      setState(() {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Fingerpad(),
+          ));
+      });
+      
+    } on LockerException catch (e) {
+      if (e.reason == LockerExceptionReason.authenticationCanceled || e.reason == LockerExceptionReason.authenticationFailed)
+      {
+        showTopSnackBar(
+          context,
+          CustomSnackBar.info(
+            message:
+                "Authentication failed",
+            backgroundColor: Color.fromARGB(255, 221, 22, 22),
+          ),
+        );
+      }
+    }
+    on Exception {
+      showTopSnackBar(
+        context,
+        CustomSnackBar.info(
+          message:
+              "An error occured",
+          backgroundColor: Color.fromARGB(255, 221, 22, 22),
+        ),
+      );
+    }
+
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +169,7 @@ class _WelcomeState extends State<Welcome> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: Text(
-                  'Welcome! Please input your login and password and press one of the buttons to continue', 
+                  'Welcome! Please input your login and password and press one of the buttons to continue (or use fingerprint)', 
                   maxLines: null,
                   textAlign: TextAlign.center,
                 ),
@@ -349,10 +404,33 @@ class _WelcomeState extends State<Welcome> {
                   ),
                   child: const Text('CHANGE PASSWORD')
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height*0.001),
+                SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                Text('OR',style: TextStyle(fontWeight: FontWeight.bold),),
+                SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                IconButton(
+                  icon: Icon(Icons.fingerprint), 
+                  onPressed: () async {
+                    await _canAuthenticate()
+                    ? _getToFingernotes()
+                    : showTopSnackBar(
+                      context,
+                      CustomSnackBar.info(
+                          message:
+                              "Authentication method unavailable",
+                          backgroundColor: Color.fromARGB(255, 245, 4, 4),
+                      ),
+                      );
+                  },
+                  iconSize: min(MediaQuery.of(context).size.height*0.1, MediaQuery.of(context).size.width*0.1),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height*0.005),
                 ElevatedButton(
                   onPressed: () async {
                     _storage.deleteAll();
+                    try {
+                      await FlutterLocker.delete('notes');
+                    }
+                    catch (e) {}
                     showTopSnackBar(
                         context,
                         CustomSnackBar.info(
