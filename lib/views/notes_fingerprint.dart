@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_locker/flutter_locker.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
