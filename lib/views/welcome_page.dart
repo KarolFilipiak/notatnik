@@ -3,9 +3,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'package:notatnik/views/notes.dart';
+import 'package:notatnik/views/notes_credentials.dart';
 import 'package:notatnik/views/notes_fingerprint.dart';
 import 'package:notatnik/views/change_credentials.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
