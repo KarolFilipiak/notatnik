@@ -89,22 +89,33 @@ class F
 
     final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
 
-    final encrypted = encrypter.encrypt(toEncrypt, iv: iv);
-
     print("IV: ${iv.base64}");
     print("Key: ${key.base64}");
 
     await _storage.write(key: 'IV', value: iv.base64);
-    await _storage.write(key: 'notes', value: encrypted.base64);
 
-    return encrypted.base64;
+    if (toEncrypt != '')
+    {
+      final encrypted = encrypter.encrypt(toEncrypt, iv: iv);
+      await _storage.write(key: 'notes', value: encrypted.base64);
+
+      return encrypted.base64;  
+    }
+    else
+    {
+      if (await _storage.containsKey(key: 'notes'))
+        await _storage.delete(key: 'notes');
+      return '';
+    }
+
+    
   }
 
 
   static Future<String> decryptWithHash (final toDecrypt, String hash) async {
     final _storage = const FlutterSecureStorage();
     print("decode_in");
-    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty))
+    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "notes") && ((await _storage.read(key: "notes"))!.isNotEmpty))
     {
       final iv_in = (await _storage.read(key: "IV"))!;
       final iv = enc.IV.fromBase64(iv_in);
@@ -124,7 +135,7 @@ class F
     else
     {
       print("decode_nocode");
-      return ' ';
+      return '';
     }
   }
 
