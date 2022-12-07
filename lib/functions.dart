@@ -4,10 +4,14 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:cryptography/cryptography.dart' as cry;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:convert' as convert;
+
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class F
 {
@@ -170,5 +174,90 @@ class F
     String digest = sha256.convert(bytes).toString();
     digest = await stretch(digest,1);
     return digest;
+  }
+
+  static void snack(context, msg, mode)
+  {
+    if (mode == "top_red")
+    {
+      showTopSnackBar(
+        context,
+        CustomSnackBar.info(
+          message:
+              msg,
+          backgroundColor: Color.fromARGB(255, 221, 22, 22),
+        ),
+        animationDuration: Duration(milliseconds: 800),
+        displayDuration: Duration(milliseconds: 600)
+      );
+    } 
+    else if (mode == "top_lightred")
+    {
+      showTopSnackBar(
+        context,
+        CustomSnackBar.info(
+          message:
+              msg,
+          backgroundColor: Colors.redAccent,
+        ),
+        animationDuration: Duration(milliseconds: 800),
+        displayDuration: Duration(milliseconds: 600)
+      );
+    }
+    else if (mode == "top_lightgreen")
+    {
+      showTopSnackBar(
+        context,
+        CustomSnackBar.info(
+          message:
+              msg,
+          backgroundColor: Colors.greenAccent,
+          ),
+        animationDuration: Duration(milliseconds: 800),
+        displayDuration: Duration(milliseconds: 600)
+      );
+    }
+    else if (mode == "bottom_green")
+    {
+      final snackBar = SnackBar(
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'X',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    else if (mode == "bottom_red")
+    {
+      final snackBar = SnackBar(
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'X',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+        backgroundColor: Colors.red,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    else 
+    {
+      final snackBar = SnackBar(
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'X',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        )
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 }

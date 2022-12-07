@@ -132,14 +132,7 @@ class _NotepadState extends State<Notepad> {
                         });
                         //print(notepad);
 
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Note saved successfully",
-                            backgroundColor: Colors.greenAccent,
-                            ),
-                        );
+                        F.snack(context, "Note saved successfully", "top_lightgreen");
                       },
                       style: ElevatedButton.styleFrom(
 

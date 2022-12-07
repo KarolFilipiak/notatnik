@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locker/flutter_locker.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:notatnik/functions.dart';
 
 class Fingerpad extends StatefulWidget {
   Fingerpad({Key? key}) : super(key: key);
@@ -30,44 +31,16 @@ class _FingerpadState extends State<Fingerpad> {
                     descriptionLabel: 'Please authenticate to save note')),
           );
 
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                "Note saved successfully",
-              backgroundColor: Colors.greenAccent,
-            ),
-          );
+          F.snack(context, "Note saved successfully", "top_lightgreen");
           
         } on LockerException catch(e) {
           if(e.reason == LockerExceptionReason.authenticationFailed || e.reason == LockerExceptionReason.authenticationCanceled) {
-            showTopSnackBar(
-              context,
-              CustomSnackBar.info(
-                message:
-                    "Saving failed",
-                backgroundColor: Color.fromARGB(255, 221, 22, 22),
-                ),
-            );
+            F.snack(context, "Saving failed", "top_red");
           }
         } on Exception catch (e) {
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                  "Saving failed",
-              backgroundColor: Color.fromARGB(255, 221, 22, 22),
-              ),
-          );
+          F.snack(context, "Saving failed", "top_red");
         } catch(e) {
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                  "Saving failed",
-              backgroundColor: Color.fromARGB(255, 221, 22, 22),
-              ),
-          );
+          F.snack(context, "Saving failed", "top_red");
         }
       }
       else 
@@ -84,60 +57,22 @@ class _FingerpadState extends State<Fingerpad> {
           );
           await FlutterLocker.delete('notes');
 
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                "Note saved successfully",
-              backgroundColor: Colors.greenAccent,
-            ),
-          );
+          F.snack(context, "Note saved successfully", "top_lightgreen");
 
         } on LockerException catch (e) {
           if (e.reason == LockerExceptionReason.secretNotFound){}
           else 
           {
-            showTopSnackBar(
-              context,
-              CustomSnackBar.info(
-                message:
-                    "Saving failed",
-                backgroundColor: Color.fromARGB(255, 221, 22, 22),
-                ),
-            );
+            F.snack(context, "Saving failed", "top_red");
           }
         } on Exception catch (e) {
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                  "Saving failed",
-              backgroundColor: Color.fromARGB(255, 221, 22, 22),
-              ),
-          );
+          F.snack(context, "Saving failed", "top_red");
         } catch (e) {
-          showTopSnackBar(
-            context,
-            CustomSnackBar.info(
-              message:
-                  "Saving failed",
-              backgroundColor: Color.fromARGB(255, 221, 22, 22),
-              ),
-          );
-        }
-        
+          F.snack(context, "Saving failed", "top_red");
+        } 
       }
-
-      
     } on Exception catch (exception) {
-      showTopSnackBar(
-        context,
-        CustomSnackBar.info(
-          message:
-              "Saving interrupted",
-          backgroundColor: Color.fromARGB(255, 221, 22, 22),
-          ),
-      );
+      F.snack(context, "Saving interrupted", "top_red");
     }
   }
 
@@ -173,46 +108,18 @@ class _FingerpadState extends State<Fingerpad> {
         } on LockerException catch (e) {
           if (e.reason == LockerExceptionReason.authenticationFailed || e.reason == LockerExceptionReason.authenticationCanceled)
           {
-            showTopSnackBar(
-              context,
-              CustomSnackBar.info(
-                message:
-                    "Loading failed",
-                backgroundColor: Color.fromARGB(255, 221, 22, 22),
-              ),
-            );
+            F.snack(context, "Loading failed", "top_red");
           }
         }
       }
       else {
-        showTopSnackBar(
-          context,
-          CustomSnackBar.info(
-            message:
-                "Loading failed",
-            backgroundColor: Color.fromARGB(255, 221, 22, 22),
-          ),
-        );
+        F.snack(context, "Loading failed", "top_red");
       }
     } 
     on Exception catch (e) {
-      showTopSnackBar(
-        context,
-        CustomSnackBar.info(
-          message:
-              "Loading failed",
-          backgroundColor: Color.fromARGB(255, 221, 22, 22),
-        ),
-      );
+      F.snack(context, "Loading failed", "top_red");
     } catch (e) {
-      showTopSnackBar(
-        context,
-        CustomSnackBar.info(
-          message:
-              "Loading failed",
-          backgroundColor: Color.fromARGB(255, 221, 22, 22),
-        ),
-      );
+      F.snack(context, "Loading failed", "top_red");
     }
   }
 

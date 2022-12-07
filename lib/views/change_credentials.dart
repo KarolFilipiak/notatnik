@@ -172,44 +172,16 @@ class _CredentialsState extends State<Credentials> {
               ElevatedButton(
                     onPressed: () async {
                       if(login.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type new login",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
+                        F.snack(context, "Please type your login", "top_lightred");
                       }
                       else if (login.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Login should consist of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
+                        F.snack(context, "Login consists of at least 2 letters", "top_lightred");
                       }
                       else if (pass.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type new password",
-                            backgroundColor: Colors.redAccent,
-                          ),
-                        );
+                        F.snack(context, "Please type your password", "top_lightred");
                       }
                       else if (pass.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Password should consist of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
+                        F.snack(context, "Password consists of at least 2 letters", "top_lightred");
                       }
                       else {
                         String note = '';
@@ -240,14 +212,7 @@ class _CredentialsState extends State<Credentials> {
                         
                         clear_input();
 
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Credentials changed successfully",
-                            backgroundColor: Colors.greenAccent,
-                            ),
-                        );
+                        F.snack(context, "Credentials changed successfully", "top_lightgreen");
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -110,25 +110,11 @@ class _WelcomeState extends State<Welcome> {
     } on LockerException catch (e) {
       if (e.reason == LockerExceptionReason.authenticationCanceled || e.reason == LockerExceptionReason.authenticationFailed)
       {
-        showTopSnackBar(
-          context,
-          CustomSnackBar.info(
-            message:
-                "Authentication failed",
-            backgroundColor: Color.fromARGB(255, 221, 22, 22),
-          ),
-        );
+        F.snack(context, "Authentication failed", "top_red");
       }
     }
     on Exception {
-      showTopSnackBar(
-        context,
-        CustomSnackBar.info(
-          message:
-              "An error occured",
-          backgroundColor: Color.fromARGB(255, 221, 22, 22),
-        ),
-      );
+      F.snack(context, "An error occured", "top_red");
     }
 
     
@@ -162,291 +148,205 @@ class _WelcomeState extends State<Welcome> {
       backgroundColor: Color.fromARGB(255, 224, 157, 245),
       body: Container(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: ListView(
+            shrinkWrap: true,
             children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Text(
-                  'Welcome! Please input your login and password and press one of the buttons to continue (or use fingerprint)', 
-                  maxLines: null,
-                  textAlign: TextAlign.center,
-                ),
-              ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Text(
+                          'Welcome! Please input your login and password and press one of the buttons to continue (or use fingerprint)', 
+                          maxLines: null,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
 
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                width: 150,
-                height: 40,
-                child: TextField(
-                  onChanged: (var value) {
-                    setState(() {
-                      login = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Login",
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.only(
-                          left: 8, right: 8, bottom: 8)),
-                  controller: loginTextControl,
-                ),
-              ),
-              SizedBox(height: 5,),
-              SizedBox(
-                width: 150,
-                height: 40,
-                child: TextField(
-                  obscureText: true,
-                  onChanged: (var value) {
-                    setState(() {
-                      pass = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Password",
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.only(
-                          left: 8, right: 8, bottom: 8)),
-                  controller: passwordTextControl,
-                ),
-              ),
-              SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      if(login.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type your login",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
-                      }
-                      else if (login.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Login consists of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
-                      }
-                      else if (pass.isEmpty) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Please type your password",
-                            backgroundColor: Colors.redAccent,
-                          ),
-                        );
-                      }
-                      else if (pass.length < 2) {
-                        showTopSnackBar(
-                          context,
-                          CustomSnackBar.info(
-                            message:
-                                "Password consists of at least 2 letters",
-                            backgroundColor: Colors.redAccent,
-                            ),
-                        );
-                      }
-                      else {
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        width: 150,
+                        height: 40,
+                        child: TextField(
+                          onChanged: (var value) {
+                            setState(() {
+                              login = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: "Login",
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                  left: 8, right: 8, bottom: 8)),
+                          controller: loginTextControl,
+                        ),
+                      ),
+                      SizedBox(height: 5,),
+                      SizedBox(
+                        width: 150,
+                        height: 40,
+                        child: TextField(
+                          obscureText: true,
+                          onChanged: (var value) {
+                            setState(() {
+                              pass = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: "Password",
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                  left: 8, right: 8, bottom: 8)),
+                          controller: passwordTextControl,
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              if(login.isEmpty) {
+                                F.snack(context, "Please type your login", "top_lightred");
+                              }
+                              else if (login.length < 2) {
+                                F.snack(context, "Login consists of at least 2 letters", "top_lightred");
+                              }
+                              else if (pass.isEmpty) {
+                                F.snack(context, "Please type your password", "top_lightred");
+                              }
+                              else if (pass.length < 2) {
+                                F.snack(context, "Password consists of at least 2 letters", "top_lightred");
+                              }
+                              else {
 
-                        final bool verification = await verifyCredentials(login, pass);
-                        final bool hasHash = await checkData();
-                        //final bool hasHash = await F.hasNote();
-                        
-                        if(hasHash && verification){
-                          String hashed = await F.makeHash(login,pass);
-                          clear_input();
-                          setState(()  {  
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => Notepad(curr_hash: hashed,),
-                                )
+                                final bool verification = await verifyCredentials(login, pass);
+                                final bool hasHash = await checkData();
+                                //final bool hasHash = await F.hasNote();
                                 
-                              );
+                                if(hasHash && verification){
+                                  String hashed = await F.makeHash(login,pass);
+                                  clear_input();
+                                  setState(()  {  
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => Notepad(curr_hash: hashed,),
+                                        )
+                                        
+                                      );
+                                    }
+                                  );
+                                  }
+                                  else if (!hasHash){
+                                    F.snack(context, "Change your credentials first", "top_lightred");
+                                  }
+                                  else {
+                                    F.snack(context, "Wrong credentials", "top_lightred");
+                                  }
+                              }
+                            }, 
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 241, 69, 247),
+                            ),
+                            child: const Text('LOG IN')
+                          ),
+                          SizedBox(width: MediaQuery.of(context).size.width*0.02),
+                          ElevatedButton(
+                            onPressed: () async {
+                              // setState(() {
+                              //   loginTextControl.clear();
+                              //   passwordTextControl.clear();
+                              //   login = '';
+                              //   pass = '';
+                              // });
+                              clear_input();
+                            }, 
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 241, 69, 247),
+                            ),
+                            child: const Text('CLEAR')
+                          )
+                        ],
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height*0.001),
+                      ElevatedButton(
+                          onPressed: () async {
+                            if(login.isEmpty) {
+                              F.snack(context, "Please type your login", "top_lightred");
                             }
-                          );
-                          }
-                          else if (!hasHash){
-                            showTopSnackBar(
-                            context,
-                            CustomSnackBar.info(
-                              message:
-                                  "Change your credentials first",
-                              backgroundColor: Colors.redAccent,
-                            ),
-                            );
-                          }
-                          else {
-                            showTopSnackBar(
-                            context,
-                            CustomSnackBar.info(
-                              message:
-                                  "Wrong credentials",
-                              backgroundColor: Colors.redAccent,
-                            ),
-                            );
-                          }
-                      }
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      primary: const Color.fromARGB(255, 241, 69, 247),
-                    ),
-                    child: const Text('LOG IN')
+                            else if (login.length < 2) {
+                              F.snack(context, "Login consists of at least 2 letters", "top_lightred");
+                            }
+                            else if (pass.isEmpty) {
+                              F.snack(context, "Please type your password", "top_lightred");
+                            }
+                            else if (pass.length < 2) {
+                              F.snack(context, "Password consists of at least 2 letters", "top_lightred");
+                            }
+                            else {
+                              final bool verification = await verifyCredentials(login, pass);
+                              
+                              if(verification){
+                                String hashed = await F.makeHash(login,pass);
+                                clear_input();
+                                setState(()  {
+                                  String l = login;
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => Credentials(curr_hash: hashed),
+                                    )
+                                    
+                                  );
+                                });
+                              }
+                              else {
+                                F.snack(context, "Wrong credentials", "top_lightred");
+                              }
+                            }
+                          }, 
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color.fromARGB(255, 241, 69, 247),
+                          ),
+                          child: const Text('CHANGE PASSWORD')
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                        Text('OR',style: TextStyle(fontWeight: FontWeight.bold),),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                        IconButton(
+                          icon: Icon(Icons.fingerprint), 
+                          onPressed: () async {
+                            await _canAuthenticate()
+                            ? _getToFingernotes()
+                            : F.snack(context, "Authentication method unavailable", "top_red");
+                          },
+                          iconSize: min(MediaQuery.of(context).size.height*0.1, MediaQuery.of(context).size.width*0.1),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                        ElevatedButton(
+                          onPressed: () async {
+                            _storage.deleteAll();
+                            try {
+                              await FlutterLocker.delete('notes');
+                            }
+                            catch (e) {}
+                            F.snack(context, "Data erased", "top_red");
+                            clear_input();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromARGB(255, 240, 8, 8),
+                          ),
+                          child: const Text('RESET DATA'))
+                    ]
                   ),
-                  SizedBox(width: MediaQuery.of(context).size.width*0.02),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // setState(() {
-                      //   loginTextControl.clear();
-                      //   passwordTextControl.clear();
-                      //   login = '';
-                      //   pass = '';
-                      // });
-                      clear_input();
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      primary: const Color.fromARGB(255, 241, 69, 247),
-                    ),
-                    child: const Text('CLEAR')
-                  )
                 ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height*0.001),
-              ElevatedButton(
-                  onPressed: () async {
-                    if(login.isEmpty) {
-                      showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Please type your login",
-                          backgroundColor: Colors.redAccent,
-                          ),
-                      );
-                    }
-                    else if (login.length < 2) {
-                      showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Login consists of at least 2 letters",
-                          backgroundColor: Colors.redAccent,
-                          ),
-                      );
-                    }
-                    else if (pass.isEmpty) {
-                      showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Please type your password",
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
-                    else if (pass.length < 2) {
-                      showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Password consists of at least 2 letters",
-                          backgroundColor: Colors.redAccent,
-                          ),
-                      );
-                    }
-                    else {
-                      final bool verification = await verifyCredentials(login, pass);
-                      
-                      if(verification){
-                        String hashed = await F.makeHash(login,pass);
-                        clear_input();
-                        setState(()  {
-                          String l = login;
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => Credentials(curr_hash: hashed),
-                            )
-                            
-                          );
-                        });
-                      }
-                      else {
-                        showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Wrong credentials",
-                          backgroundColor: Colors.redAccent,
-                        ),
-                        );
-                      }
-                    }
-                  }, 
-                  style: ElevatedButton.styleFrom(
-                    primary: const Color.fromARGB(255, 241, 69, 247),
-                  ),
-                  child: const Text('CHANGE PASSWORD')
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height*0.005),
-                Text('OR',style: TextStyle(fontWeight: FontWeight.bold),),
-                SizedBox(height: MediaQuery.of(context).size.height*0.005),
-                IconButton(
-                  icon: Icon(Icons.fingerprint), 
-                  onPressed: () async {
-                    await _canAuthenticate()
-                    ? _getToFingernotes()
-                    : showTopSnackBar(
-                      context,
-                      CustomSnackBar.info(
-                          message:
-                              "Authentication method unavailable",
-                          backgroundColor: Color.fromARGB(255, 245, 4, 4),
-                      ),
-                      );
-                  },
-                  iconSize: min(MediaQuery.of(context).size.height*0.1, MediaQuery.of(context).size.width*0.1),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height*0.005),
-                ElevatedButton(
-                  onPressed: () async {
-                    _storage.deleteAll();
-                    try {
-                      await FlutterLocker.delete('notes');
-                    }
-                    catch (e) {}
-                    showTopSnackBar(
-                        context,
-                        CustomSnackBar.info(
-                          message:
-                              "Data erased",
-                          backgroundColor: Color.fromARGB(255, 245, 4, 4),
-                      ),
-                    );
-                    clear_input();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 240, 8, 8),
-                  ),
-                  child: const Text('RESET DATA'))
-            ]
-            ),
+              )
           )
         ),
     );
