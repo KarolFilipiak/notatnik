@@ -22,59 +22,42 @@ class _FingerpadState extends State<Fingerpad> {
     try {
       if (notepad != '')
       {
-        try {
-          await FlutterLocker.save(
-            SaveSecretRequest(
-                key: 'notes',
-                secret: notepad,
-                androidPrompt: AndroidPrompt(
-                    title: 'Authenticate',
-                    cancelLabel: 'Cancel',
-                    descriptionLabel: 'Please authenticate to save note')),
-          );
-
-          F.snack(context, "Note saved successfully", "top_lightgreen");
-          
-        } on LockerException catch(e) {
-          if(e.reason == LockerExceptionReason.authenticationFailed || e.reason == LockerExceptionReason.authenticationCanceled) {
-            F.snack(context, "Saving failed", "top_red");
-          }
-        } on Exception catch (e) {
-          F.snack(context, "Saving failed", "top_red");
-        } catch(e) {
-          F.snack(context, "Saving failed", "top_red");
-        }
+        await FlutterLocker.save(
+          SaveSecretRequest(
+              key: 'notes',
+              secret: notepad,
+              androidPrompt: AndroidPrompt(
+                title: 'Authenticate',
+                cancelLabel: 'Cancel',
+                descriptionLabel: 'Please authenticate to save note'
+              )
+          ),
+        );
       }
       else 
       {
-        try {
-          await FlutterLocker.save(
-            SaveSecretRequest(
-                key: 'notes',
-                secret: 'notepad',
-                androidPrompt: AndroidPrompt(
-                    title: 'Authenticate',
-                    cancelLabel: 'Cancel',
-                    descriptionLabel: 'Please authenticate to save note')),
-          );
-          await FlutterLocker.delete('notes');
-
-          F.snack(context, "Note saved successfully", "top_lightgreen");
-
-        } on LockerException catch (e) {
-          if (e.reason == LockerExceptionReason.secretNotFound){}
-          else 
-          {
+        await FlutterLocker.save(
+          SaveSecretRequest(
+            key: 'notes',
+            secret: 'notepad',
+            androidPrompt: AndroidPrompt(
+                title: 'Authenticate',
+                cancelLabel: 'Cancel',
+                descriptionLabel: 'Please authenticate to save note'
+              )
+            ),
+        );
+        await FlutterLocker.delete('notes');
+      }
+      F.snack(context, "Note saved successfully", "top_lightgreen");
+    } on LockerException catch(e) {
+          if(e.reason == LockerExceptionReason.authenticationFailed || e.reason == LockerExceptionReason.authenticationCanceled) {
             F.snack(context, "Saving failed", "top_red");
           }
-        } on Exception catch (e) {
-          F.snack(context, "Saving failed", "top_red");
-        } catch (e) {
-          F.snack(context, "Saving failed", "top_red");
-        } 
-      }
-    } on Exception catch (exception) {
-      F.snack(context, "Saving interrupted", "top_red");
+    } on Exception catch (e) {
+      F.snack(context, "Saving failed", "top_red");
+    } catch(e) {
+      F.snack(context, "Saving failed", "top_red");
     }
   }
 
@@ -83,10 +66,13 @@ class _FingerpadState extends State<Fingerpad> {
       final retrieved = await FlutterLocker.retrieve(RetrieveSecretRequest(
           key: 'notes',
           androidPrompt: AndroidPrompt(
-              title: 'Authenticate',
-              cancelLabel: 'Cancel',
-              descriptionLabel: 'Please authenticate to get note'),
-          iOsPrompt: IOsPrompt(touchIdText: 'Authenticate')));
+            title: 'Authenticate',
+            cancelLabel: 'Cancel',
+            descriptionLabel: 'Please authenticate to get note'
+          ),
+          iOsPrompt: IOsPrompt(touchIdText: 'Authenticate')
+        )
+      );
 
       setState(() {
         notepad = retrieved;
@@ -98,12 +84,14 @@ class _FingerpadState extends State<Fingerpad> {
         try {
           await FlutterLocker.save(
             SaveSecretRequest(
-                key: 'notes',
-                secret: 'notepad',
-                androidPrompt: AndroidPrompt(
-                    title: 'Authenticate',
-                    cancelLabel: 'Cancel',
-                    descriptionLabel: 'Please authenticate to save note')),
+              key: 'notes',
+              secret: 'notepad',
+              androidPrompt: AndroidPrompt(
+                title: 'Authenticate',
+                cancelLabel: 'Cancel',
+                descriptionLabel: 'Please authenticate to save note'
+              )
+            ),
           );
           await FlutterLocker.delete('notes');
           clear_input();
