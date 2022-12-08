@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locker/flutter_locker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:cryptography/cryptography.dart' as cry;
@@ -269,6 +270,162 @@ class F
         )
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  static Future combo_generateIv() async
+  {
+    final _storage = const FlutterSecureStorage();
+    final iv = enc.IV.fromSecureRandom(16);
+    
+    await _storage.write(key: 'combo_IV', value: iv.base64);
+    
+  }
+
+
+  static Future combo_stretch(var input, int mode ) async {
+    final _storage = const FlutterSecureStorage();
+    final pbkdf2 = cry.Pbkdf2(
+      macAlgorithm: cry.Hmac.sha256(),
+      iterations: 100000,
+      bits: 256,
+    );
+
+    // Password we want to hash
+    final secretKey = cry.SecretKey(convert.utf8.encode(input));
+
+    // Salt
+    final nonce;
+    if (await _storage.containsKey(key: "combo_SALT") && mode == 0) 
+    {
+      nonce = base64Decode((await _storage.read(key: "combo_SALT"))!);
+    }
+    else
+    {
+      nonce = secureRandom(16);
+      await _storage.write(key: 'combo_SALT', value: base64Encode(nonce));
+    }
+
+    // Calculate a hash that can be stored
+    final newSecretKey = await pbkdf2.deriveKey(
+      secretKey: secretKey,
+      nonce: nonce
+    );
+
+    final newSecretKeyBytes = await newSecretKey.extractBytes();
+    print('Result: $newSecretKeyBytes');
+
+    return base64Encode(newSecretKeyBytes);
+  }
+
+  static Future<String> combo_makeHash(String log, String pas) async
+  {
+    var bytes = utf8.encode(log[0]+pas+log+pas[1]); // data being hashed
+    String digest = sha256.convert(bytes).toString();
+    digest = await combo_stretch(digest,0);
+    return digest;
+  }
+
+  static Future<String> combo_makeHash1(String log, String pas) async
+  {
+    var bytes = utf8.encode(log[0]+pas+log+pas[1]); // data being hashed
+    String digest = sha256.convert(bytes).toString();
+    digest = await combo_stretch(digest,1);
+    return digest;
+  }
+
+  static Future combo_encrypt(String toEncrypt) async {
+    final _storage = const FlutterSecureStorage();
+    final key = enc.Key.fromSecureRandom(32);
+    final iv = enc.IV.fromSecureRandom(16);
+
+    final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
+
+    print("IV: ${iv.base64}");
+    print("Key: ${key.base64}");
+
+    await _storage.write(key: 'combo_IV', value: iv.base64);
+    await _storage.write(key: 'combo_key', value: key.base64);
+
+    if (toEncrypt != '')
+    {
+      final encrypted = encrypter.encrypt(toEncrypt, iv: iv);
+      await _storage.write(key: 'combo_notes', value: encrypted.base64);
+
+      return encrypted.base64;  
+    }
+    else
+    {
+      if (await _storage.containsKey(key: 'combo_notes'))
+        await _storage.delete(key: 'combo_notes');
+      return '';
+    }
+
+    
+  }
+
+  static Future<String> combo_decrypt(final toDecrypt) async
+  {
+    final _storage = FlutterSecureStorage();
+    if (await _storage.containsKey(key: "combo_IV") && ((await _storage.read(key: "combo_IV"))!.isNotEmpty) && await _storage.containsKey(key: "combo_notes") && ((await _storage.read(key: "combo_notes"))!.isNotEmpty) && await _storage.containsKey(key: "combo_key") && ((await _storage.read(key: "combo_key"))!.isNotEmpty) )
+    {
+      final iv_in = (await _storage.read(key: "combo_IV"))!;
+      final iv = enc.IV.fromBase64(iv_in);
+      print("decode_code");
+
+      final key = enc.Key.fromBase64((await _storage.read(key: "combo_key"))!);
+
+      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
+      final encrypted = enc.Encrypted.fromBase64(toDecrypt);
+
+
+      final decrypted = encrypter.decrypt(encrypted, iv: iv);
+
+      return decrypted;
+
+    }
+    else
+    {
+      print("decode_nocode");
+      return '';
+    }
+  }
+
+  static Future<bool> combo_checkData(debug) async {
+    final _storage = FlutterSecureStorage();
+    if (debug) {
+      print("CHECKED HASH: ${await _storage.read(key: 'combo_hash')}");
+    }
+    
+
+    if (await _storage.containsKey(key: "combo_hash") && ((await _storage.read(key: "combo_hash"))!.isNotEmpty)) {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  static Future<bool> combo_verifyCredentials(String log, String pas) async {
+    final _storage = FlutterSecureStorage();
+    String digest = '';
+    String fromStorage = '';
+
+    
+    if (await _storage.containsKey(key: "combo_hash") && ((await _storage.read(key: "combo_hash"))!.isNotEmpty)) {
+      digest = await combo_makeHash(log, pas);
+      fromStorage = (await _storage.read(key: "combo_hash"))!;
+    }
+
+
+    if(digest == fromStorage)
+    {
+      await _storage.write(key: "login", value: log);
+      return true;
+    }
+    else {
+      return false;
     }
   }
 }

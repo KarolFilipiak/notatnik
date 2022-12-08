@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:notatnik/views/notes_credentials.dart';
 import 'package:notatnik/views/notes_fingerprint.dart';
+import 'package:notatnik/views/notes_combo.dart';
 import 'package:notatnik/views/change_credentials.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:notatnik/functions.dart';
@@ -116,8 +117,35 @@ class _WelcomeState extends State<Welcome> {
     on Exception {
       F.snack(context, "An error occured", "top_red");
     }
+  }
 
-    
+  Future<void> _combo_getToFingernotes() async {
+    try {
+      await FlutterLocker.save(SaveSecretRequest(
+            key: 'checkfinger', 
+            secret: 'x', 
+            androidPrompt: AndroidPrompt(
+                  title: 'Authenticate',
+                  cancelLabel: 'Cancel',
+                  descriptionLabel: 'Please authenticate to save note')
+          ),);
+
+      setState(() {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Combopad(),
+          ));
+      });
+      
+    } on LockerException catch (e) {
+      if (e.reason == LockerExceptionReason.authenticationCanceled || e.reason == LockerExceptionReason.authenticationFailed)
+      {
+        F.snack(context, "Authentication failed", "top_red");
+      }
+    }
+    on Exception {
+      F.snack(context, "An error occured", "top_red");
+    }
   }
 
   @override
@@ -342,7 +370,87 @@ class _WelcomeState extends State<Welcome> {
                           style: ElevatedButton.styleFrom(
                             primary: Color.fromARGB(255, 240, 8, 8),
                           ),
-                          child: const Text('RESET DATA'))
+                          child: const Text('RESET DATA')
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                        Text('OR',style: TextStyle(fontWeight: FontWeight.bold),),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                if(login.isEmpty) {
+                                  F.snack(context, "Please type your login", "top_lightred");
+                                }
+                                else if (login.length < 2) {
+                                  F.snack(context, "Login consists of at least 2 letters", "top_lightred");
+                                }
+                                else if (pass.isEmpty) {
+                                  F.snack(context, "Please type your password", "top_lightred");
+                                }
+                                else if (pass.length < 2) {
+                                  F.snack(context, "Password consists of at least 2 letters", "top_lightred");
+                                }
+                                else {
+
+                                  final bool verification = await F.combo_verifyCredentials(login, pass);
+                                  final bool hasHash = await F.combo_checkData(debug);
+                                  //final bool hasHash = await F.hasNote();
+                                  
+                                  if(hasHash && verification){
+                                    String hashed = await F.combo_makeHash(login,pass);
+                                    clear_input();
+                                    setState(()  {  
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => Combopad(),
+                                          )
+                                          
+                                        );
+                                      }
+                                    );
+                                  }
+                                  else if (!hasHash){
+                                    F.snack(context, "Change your credentials first", "top_lightred");
+                                  }
+                                  else {
+                                    F.snack(context, "Wrong credentials", "top_lightred");
+                                  }
+                                }
+                              }, 
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 241, 69, 247),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('LOG IN'),
+                                const Icon(Icons.lock_open),
+                              ],
+                            )
+                          ),
+                          SizedBox(width: MediaQuery.of(context).size.width*0.02),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await _canAuthenticate()
+                              ? _combo_getToFingernotes()
+                              : F.snack(context, "Authentication method unavailable", "top_red");
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 241, 69, 247),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('LOG IN'),
+                                const Icon(Icons.fingerprint),
+                              ],
+                            ),
+                          )
+                          
+                          ],
+                        )
                     ]
                   ),
                 ],

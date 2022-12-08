@@ -204,7 +204,24 @@ class _CredentialsState extends State<Credentials> {
                         {
                           F.generateIv();
                         }
-                        
+
+                        if (await _storage.containsKey(key: "combo_notes") && ((await _storage.read(key: "combo_notes"))!.isNotEmpty) && ((await _storage.read(key: "combo_notes"))! != ''))
+                        {
+                          note = (await _storage.read(key: "combo_notes"))!;
+                          note = await F.combo_decrypt(note);
+                        }
+                        digest = await F.combo_makeHash1(login, pass);
+                        print("Stretched: ${digest}");
+                        await _storage.write(key: 'combo_hash', value: digest);
+                        if (note != '')
+                        {
+                          await F.combo_encrypt(note);
+                        }
+                        else 
+                        {
+                          F.combo_generateIv();
+                        }
+
                         clear_input();
 
                         F.snack(context, "Credentials changed successfully", "top_lightgreen");
