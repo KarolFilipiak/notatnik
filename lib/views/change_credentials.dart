@@ -42,13 +42,13 @@ class _CredentialsState extends State<Credentials> {
 
   Future<String> decryptWithHash (final toDecrypt, String hash) async {
     print("decode_in");
-    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "KEY") && ((await _storage.read(key: "KEY"))!.isNotEmpty))
+    if (await _storage.containsKey(key: "IV", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!.isNotEmpty) && await _storage.containsKey(key: "KEY", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "KEY", aOptions: O.getAndroidOptions()))!.isNotEmpty))
     {
-      final iv_in = (await _storage.read(key: "IV"))!;
+      final iv_in = (await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!;
       final iv = enc.IV.fromBase64(iv_in);
       print("decode_code");
 
-      final key_in = (await _storage.read(key: "KEY"))!;
+      final key_in = (await _storage.read(key: "KEY", aOptions: O.getAndroidOptions()))!;
       final key = enc.Key.fromBase64(key_in);
 
       final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
@@ -79,8 +79,8 @@ class _CredentialsState extends State<Credentials> {
     print("IV: ${iv.base64}");
     print("Key: ${key.base64}");
 
-    await _storage.write(key: 'IV', value: iv.base64);
-    await _storage.write(key: 'notes', value: encrypted.base64);
+    await _storage.write(key: 'IV', value: iv.base64, aOptions: O.getAndroidOptions());
+    await _storage.write(key: 'notes', value: encrypted.base64, aOptions: O.getAndroidOptions());
   }
 
   @override
@@ -182,15 +182,15 @@ class _CredentialsState extends State<Credentials> {
                         String note = '';
                         
                         
-                        if (await _storage.containsKey(key: "notes") && ((await _storage.read(key: "notes"))!.isNotEmpty) && ((await _storage.read(key: "notes"))! != ''))
+                        if (await _storage.containsKey(key: "notes", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))!.isNotEmpty) && ((await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))! != ''))
                         {
-                          note = (await _storage.read(key: "notes"))!;
+                          note = (await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))!;
                           note = await F.decryptWithHash(note,hash);
                         }
 
                         String digest = await F.makeHash1(login, pass);
                         print("Stretched: ${digest}");
-                        await _storage.write(key: 'hash', value: digest);
+                        await _storage.write(key: 'hash', value: digest, aOptions: O.getAndroidOptions());
                         setState(() {
                           hash = digest;
                         });
@@ -205,14 +205,14 @@ class _CredentialsState extends State<Credentials> {
                           F.generateIv();
                         }
 
-                        if (await _storage.containsKey(key: "combo_notes") && ((await _storage.read(key: "combo_notes"))!.isNotEmpty) && ((await _storage.read(key: "combo_notes"))! != ''))
+                        if (await _storage.containsKey(key: "combo_notes", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_notes", aOptions: O.getAndroidOptions()))!.isNotEmpty) && ((await _storage.read(key: "combo_notes", aOptions: O.getAndroidOptions()))! != ''))
                         {
-                          note = (await _storage.read(key: "combo_notes"))!;
+                          note = (await _storage.read(key: "combo_notes", aOptions: O.getAndroidOptions()))!;
                           note = await F.combo_decrypt(note);
                         }
                         digest = await F.combo_makeHash1(login, pass);
                         print("Stretched: ${digest}");
-                        await _storage.write(key: 'combo_hash', value: digest);
+                        await _storage.write(key: 'combo_hash', value: digest, aOptions: O.getAndroidOptions());
                         if (note != '')
                         {
                           await F.combo_encrypt(note);

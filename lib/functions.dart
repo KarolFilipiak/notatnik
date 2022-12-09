@@ -23,8 +23,8 @@ class F
     final key = enc.Key.fromBase64(digest);
     final iv = enc.IV.fromSecureRandom(16);
     
-    await _storage.write(key: 'IV', value: iv.base64);
-    await _storage.write(key: 'KEY', value: key.base64);
+    await _storage.write(key: 'IV', value: iv.base64, aOptions: O.getAndroidOptions());
+    await _storage.write(key: 'KEY', value: key.base64, aOptions: O.getAndroidOptions());
     
   }
 
@@ -33,7 +33,7 @@ class F
     final _storage = const FlutterSecureStorage();
     final iv = enc.IV.fromSecureRandom(16);
     
-    await _storage.write(key: 'IV', value: iv.base64);
+    await _storage.write(key: 'IV', value: iv.base64, aOptions: O.getAndroidOptions());
     
   }
 
@@ -55,14 +55,14 @@ class F
 
     // Salt
     final nonce;
-    if (await _storage.containsKey(key: "SALT") && mode == 0) 
+    if (await _storage.containsKey(key: "SALT", aOptions: O.getAndroidOptions()) && mode == 0) 
     {
-      nonce = base64Decode((await _storage.read(key: "SALT"))!);
+      nonce = base64Decode((await _storage.read(key: "SALT", aOptions: O.getAndroidOptions()))!);
     }
     else
     {
       nonce = secureRandom(16);
-      await _storage.write(key: 'SALT', value: base64Encode(nonce));
+      await _storage.write(key: 'SALT', value: base64Encode(nonce), aOptions: O.getAndroidOptions());
     }
 
     // Calculate a hash that can be stored
@@ -80,7 +80,7 @@ class F
   static Future<bool> hasNote() async
   {
     final _storage = const FlutterSecureStorage();
-    return await _storage.containsKey(key: "notes");
+    return await _storage.containsKey(key: "notes", aOptions: O.getAndroidOptions());
   }
 
   static Future encryptWithHash(String toEncrypt, String hash) async {
@@ -93,19 +93,19 @@ class F
     print("IV: ${iv.base64}");
     print("Key: ${key.base64}");
 
-    await _storage.write(key: 'IV', value: iv.base64);
+    await _storage.write(key: 'IV', value: iv.base64, aOptions: O.getAndroidOptions());
 
     if (toEncrypt != '')
     {
       final encrypted = encrypter.encrypt(toEncrypt, iv: iv);
-      await _storage.write(key: 'notes', value: encrypted.base64);
+      await _storage.write(key: 'notes', value: encrypted.base64, aOptions: O.getAndroidOptions());
 
       return encrypted.base64;  
     }
     else
     {
-      if (await _storage.containsKey(key: 'notes'))
-        await _storage.delete(key: 'notes');
+      if (await _storage.containsKey(key: 'notes', aOptions: O.getAndroidOptions()))
+        await _storage.delete(key: 'notes', aOptions: O.getAndroidOptions());
       return '';
     }
 
@@ -116,9 +116,9 @@ class F
   static Future<String> decryptWithHash (final toDecrypt, String hash) async {
     final _storage = const FlutterSecureStorage();
     print("decode_in");
-    if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await _storage.containsKey(key: "notes") && ((await _storage.read(key: "notes"))!.isNotEmpty))
+    if (await _storage.containsKey(key: "IV", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!.isNotEmpty) && await _storage.containsKey(key: "notes", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))!.isNotEmpty))
     {
-      final iv_in = (await _storage.read(key: "IV"))!;
+      final iv_in = (await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!;
       final iv = enc.IV.fromBase64(iv_in);
       print("decode_code");
 
@@ -149,14 +149,14 @@ class F
     digest = await stretch(digest,0);
     
     try {
-      if (await _storage.containsKey(key: "IV") && ((await _storage.read(key: "IV"))!.isNotEmpty) && await hasNote())
+      if (await _storage.containsKey(key: "IV", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!.isNotEmpty) && await hasNote())
       {
-        final iv_in = (await _storage.read(key: "IV"))!;
+        final iv_in = (await _storage.read(key: "IV", aOptions: O.getAndroidOptions()))!;
         final iv = enc.IV.fromBase64(iv_in);
         print("decode_code");
         final key = enc.Key.fromBase64(digest);
 
-        final toDecrypt = (await _storage.read(key: "notes"))!;
+        final toDecrypt = (await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))!;
 
         final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
         final encrypted = enc.Encrypted.fromBase64(toDecrypt);
@@ -278,7 +278,7 @@ class F
     final _storage = const FlutterSecureStorage();
     final iv = enc.IV.fromSecureRandom(16);
     
-    await _storage.write(key: 'combo_IV', value: iv.base64);
+    await _storage.write(key: 'combo_IV', aOptions: O.getAndroidOptions(), value: iv.base64);
     
   }
 
@@ -296,14 +296,14 @@ class F
 
     // Salt
     final nonce;
-    if (await _storage.containsKey(key: "combo_SALT") && mode == 0) 
+    if (await _storage.containsKey(key: "combo_SALT", aOptions: O.getAndroidOptions()) && mode == 0) 
     {
-      nonce = base64Decode((await _storage.read(key: "combo_SALT"))!);
+      nonce = base64Decode((await _storage.read(key: "combo_SALT", aOptions: O.getAndroidOptions()))!);
     }
     else
     {
       nonce = secureRandom(16);
-      await _storage.write(key: 'combo_SALT', value: base64Encode(nonce));
+      await _storage.write(key: 'combo_SALT', value: base64Encode(nonce), aOptions: O.getAndroidOptions());
     }
 
     // Calculate a hash that can be stored
@@ -344,20 +344,20 @@ class F
     print("IV: ${iv.base64}");
     print("Key: ${key.base64}");
 
-    await _storage.write(key: 'combo_IV', value: iv.base64);
-    await _storage.write(key: 'combo_key', value: key.base64);
+    await _storage.write(key: 'combo_IV', value: iv.base64, aOptions: O.getAndroidOptions());
+    await _storage.write(key: 'combo_key', value: key.base64, aOptions: O.getAndroidOptions());
 
     if (toEncrypt != '')
     {
       final encrypted = encrypter.encrypt(toEncrypt, iv: iv);
-      await _storage.write(key: 'combo_notes', value: encrypted.base64);
+      await _storage.write(key: 'combo_notes', value: encrypted.base64, aOptions: O.getAndroidOptions());
 
       return encrypted.base64;  
     }
     else
     {
-      if (await _storage.containsKey(key: 'combo_notes'))
-        await _storage.delete(key: 'combo_notes');
+      if (await _storage.containsKey(key: 'combo_notes', aOptions: O.getAndroidOptions()))
+        await _storage.delete(key: 'combo_notes', aOptions: O.getAndroidOptions());
       return '';
     }
 
@@ -367,13 +367,13 @@ class F
   static Future<String> combo_decrypt(final toDecrypt) async
   {
     final _storage = FlutterSecureStorage();
-    if (await _storage.containsKey(key: "combo_IV") && ((await _storage.read(key: "combo_IV"))!.isNotEmpty) && await _storage.containsKey(key: "combo_notes") && ((await _storage.read(key: "combo_notes"))!.isNotEmpty) && await _storage.containsKey(key: "combo_key") && ((await _storage.read(key: "combo_key"))!.isNotEmpty) )
+    if (await _storage.containsKey(key: "combo_IV", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_IV", aOptions: O.getAndroidOptions()))!.isNotEmpty) && await _storage.containsKey(key: "combo_notes", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_notes", aOptions: O.getAndroidOptions()))!.isNotEmpty) && await _storage.containsKey(key: "combo_key", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_key", aOptions: O.getAndroidOptions()))!.isNotEmpty) )
     {
-      final iv_in = (await _storage.read(key: "combo_IV"))!;
+      final iv_in = (await _storage.read(key: "combo_IV", aOptions: O.getAndroidOptions()))!;
       final iv = enc.IV.fromBase64(iv_in);
       print("decode_code");
 
-      final key = enc.Key.fromBase64((await _storage.read(key: "combo_key"))!);
+      final key = enc.Key.fromBase64((await _storage.read(key: "combo_key", aOptions: O.getAndroidOptions()))!);
 
       final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.ctr));
       final encrypted = enc.Encrypted.fromBase64(toDecrypt);
@@ -394,11 +394,11 @@ class F
   static Future<bool> combo_checkData(debug) async {
     final _storage = FlutterSecureStorage();
     if (debug) {
-      print("CHECKED HASH: ${await _storage.read(key: 'combo_hash')}");
+      print("CHECKED HASH: ${await _storage.read(key: 'combo_hash', aOptions: O.getAndroidOptions())}");
     }
     
 
-    if (await _storage.containsKey(key: "combo_hash") && ((await _storage.read(key: "combo_hash"))!.isNotEmpty)) {
+    if (await _storage.containsKey(key: "combo_hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       return true;
     }
     else
@@ -413,19 +413,28 @@ class F
     String fromStorage = '';
 
     
-    if (await _storage.containsKey(key: "combo_hash") && ((await _storage.read(key: "combo_hash"))!.isNotEmpty)) {
+    if (await _storage.containsKey(key: "combo_hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       digest = await combo_makeHash(log, pas);
-      fromStorage = (await _storage.read(key: "combo_hash"))!;
+      fromStorage = (await _storage.read(key: "combo_hash", aOptions: O.getAndroidOptions()))!;
     }
 
 
     if(digest == fromStorage)
     {
-      await _storage.write(key: "login", value: log);
+      await _storage.write(key: "login", value: log, aOptions: O.getAndroidOptions());
       return true;
     }
     else {
       return false;
     }
   }
+}
+
+class O 
+{
+  static AndroidOptions getAndroidOptions() => const AndroidOptions(
+        encryptedSharedPreferences: true,
+        // sharedPreferencesName: 'Test2',
+        // preferencesKeyPrefix: 'Test'
+      );
 }

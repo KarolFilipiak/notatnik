@@ -41,13 +41,13 @@ class _WelcomeState extends State<Welcome> {
     String fromStorage = '';
 
     
-    if (await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty)) {
+    if (await _storage.containsKey(key: "hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       digest = await F.makeHash(login, pass);
-      fromStorage = (await _storage.read(key: "hash"))!;
+      fromStorage = (await _storage.read(key: "hash", aOptions: O.getAndroidOptions()))!;
     }
 
     if (debug) {
-      print(await _storage.read(key: 'hash'));
+      print(await _storage.read(key: 'hash', aOptions: O.getAndroidOptions()));
       print(digest);
     }
 
@@ -56,7 +56,7 @@ class _WelcomeState extends State<Welcome> {
       digest == fromStorage
       )
       {
-        await _storage.write(key: "login", value: log);
+        await _storage.write(key: "login", value: log, aOptions: O.getAndroidOptions());
         return true;
       }
     else {
@@ -66,12 +66,12 @@ class _WelcomeState extends State<Welcome> {
 
   Future<bool> checkData() async {
     if (debug) {
-      print("CHECKED HASH: ${await _storage.read(key: 'hash')}");
+      print("CHECKED HASH: ${await _storage.read(key: 'hash', aOptions: O.getAndroidOptions())}");
     }
     setState(() {                  
     });
 
-    if (await _storage.containsKey(key: "hash") && ((await _storage.read(key: "hash"))!.isNotEmpty)) {
+    if (await _storage.containsKey(key: "hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       return true;
     }
     else
@@ -359,7 +359,7 @@ class _WelcomeState extends State<Welcome> {
                         SizedBox(height: MediaQuery.of(context).size.height*0.005),
                         ElevatedButton(
                           onPressed: () async {
-                            _storage.deleteAll();
+                            _storage.deleteAll(aOptions: O.getAndroidOptions());
                             try {
                               await FlutterLocker.delete('notes');
                             }

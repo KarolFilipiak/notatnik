@@ -27,8 +27,8 @@ class _CombopadState extends State<Combopad> {
   }
 
   void getnotes() async {
-    if(await _storage.containsKey(key: "combo_notes"))
-      notepad = await F.combo_decrypt((await _storage.read(key: "combo_notes"))!);
+    if(await _storage.containsKey(key: "combo_notes", aOptions: O.getAndroidOptions()))
+      notepad = await F.combo_decrypt((await _storage.read(key: "combo_notes", aOptions: O.getAndroidOptions()))!);
     setState(() {
       notepadTextControl.text = notepad;
       _isLoading2 = false;
@@ -36,8 +36,8 @@ class _CombopadState extends State<Combopad> {
   }
 
   void getlogin() async {
-    if (await _storage.containsKey(key: "login")) {
-      login = (await _storage.read(key: "login"))!;
+    if (await _storage.containsKey(key: "login", aOptions: O.getAndroidOptions())) {
+      login = (await _storage.read(key: "login", aOptions: O.getAndroidOptions()))!;
     }
 
     setState(() {

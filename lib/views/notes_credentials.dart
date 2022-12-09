@@ -31,8 +31,8 @@ class _NotepadState extends State<Notepad> {
   }
 
   void getlogin() async {
-    if (await _storage.containsKey(key: "login")) {
-      login = (await _storage.read(key: "login"))!;
+    if (await _storage.containsKey(key: "login", aOptions: O.getAndroidOptions())) {
+      login = (await _storage.read(key: "login", aOptions: O.getAndroidOptions()))!;
     }
 
     setState(() {
@@ -45,8 +45,8 @@ class _NotepadState extends State<Notepad> {
     setState(() {
       hash = widget.curr_hash;
     });
-    if(await _storage.containsKey(key: "notes"))
-      notepad = await F.decryptWithHash((await _storage.read(key: "notes"))!,hash);
+    if(await _storage.containsKey(key: "notes", aOptions: O.getAndroidOptions()))
+      notepad = await F.decryptWithHash((await _storage.read(key: "notes", aOptions: O.getAndroidOptions()))!,hash);
     setState(() {
       notepadTextControl.text = notepad;
       _isLoading2 = false;
