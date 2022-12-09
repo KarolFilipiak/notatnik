@@ -190,7 +190,8 @@ class _CredentialsState extends State<Credentials> {
 
                         String digest = await F.makeHash1(login, pass);
                         print("Stretched: ${digest}");
-                        await _storage.write(key: 'hash', value: digest, aOptions: O.getAndroidOptions());
+                        var toSecSt = await F.stretch(digest,0);
+                        await _storage.write(key: 'hash', value: toSecSt, aOptions: O.getAndroidOptions());
                         setState(() {
                           hash = digest;
                         });
@@ -212,7 +213,8 @@ class _CredentialsState extends State<Credentials> {
                         }
                         digest = await F.combo_makeHash1(login, pass);
                         print("Stretched: ${digest}");
-                        await _storage.write(key: 'combo_hash', value: digest, aOptions: O.getAndroidOptions());
+                        toSecSt = await F.combo_stretch(digest,0);
+                        await _storage.write(key: 'combo_hash', value: toSecSt, aOptions: O.getAndroidOptions());
                         if (note != '')
                         {
                           await F.combo_encrypt(note);

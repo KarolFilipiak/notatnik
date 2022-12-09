@@ -39,21 +39,22 @@ class _WelcomeState extends State<Welcome> {
   Future<bool> verifyCredentials(String log, String pas) async {
     String digest = '';
     String fromStorage = '';
-
+    var hashStr = '';
     
     if (await _storage.containsKey(key: "hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       digest = await F.makeHash(login, pass);
       fromStorage = (await _storage.read(key: "hash", aOptions: O.getAndroidOptions()))!;
+      hashStr = await F.stretch(digest,0);
     }
 
     if (debug) {
       print(await _storage.read(key: 'hash', aOptions: O.getAndroidOptions()));
       print(digest);
     }
-
+    
     if(
       ((log=='aa' && pas=='bb') && debug) ||
-      digest == fromStorage
+      hashStr == fromStorage
       )
       {
         await _storage.write(key: "login", value: log, aOptions: O.getAndroidOptions());
@@ -101,6 +102,7 @@ class _WelcomeState extends State<Welcome> {
                   descriptionLabel: 'Please authenticate to save note')
           ),);
 
+      clear_input();
       setState(() {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -130,6 +132,7 @@ class _WelcomeState extends State<Welcome> {
                   descriptionLabel: 'Please authenticate to save note')
           ),);
 
+      clear_input();
       setState(() {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -177,6 +180,7 @@ class _WelcomeState extends State<Welcome> {
       body: Container(
         child: Center(
           child: ListView(
+            physics: ClampingScrollPhysics(),
             shrinkWrap: true,
             children: [
                 Column(

@@ -411,15 +411,15 @@ class F
     final _storage = FlutterSecureStorage();
     String digest = '';
     String fromStorage = '';
-
+    var hashStr = '';
     
     if (await _storage.containsKey(key: "combo_hash", aOptions: O.getAndroidOptions()) && ((await _storage.read(key: "combo_hash", aOptions: O.getAndroidOptions()))!.isNotEmpty)) {
       digest = await combo_makeHash(log, pas);
       fromStorage = (await _storage.read(key: "combo_hash", aOptions: O.getAndroidOptions()))!;
+      hashStr = await combo_stretch(digest,0);
     }
 
-
-    if(digest == fromStorage)
+    if(hashStr == fromStorage)
     {
       await _storage.write(key: "login", value: log, aOptions: O.getAndroidOptions());
       return true;
