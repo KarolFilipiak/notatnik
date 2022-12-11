@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_locker/flutter_locker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:cryptography/cryptography.dart' as cry;
@@ -46,7 +45,7 @@ class F
     final _storage = const FlutterSecureStorage();
     final pbkdf2 = cry.Pbkdf2(
       macAlgorithm: cry.Hmac.sha256(),
-      iterations: 100000,
+      iterations: 15000,
       bits: 256,
     );
 
@@ -287,7 +286,7 @@ class F
     final _storage = const FlutterSecureStorage();
     final pbkdf2 = cry.Pbkdf2(
       macAlgorithm: cry.Hmac.sha256(),
-      iterations: 100000,
+      iterations: 15000,
       bits: 256,
     );
 

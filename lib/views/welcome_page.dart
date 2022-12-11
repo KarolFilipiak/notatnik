@@ -361,22 +361,6 @@ class _WelcomeState extends State<Welcome> {
                           iconSize: min(MediaQuery.of(context).size.height*0.1, MediaQuery.of(context).size.width*0.1),
                         ),
                         SizedBox(height: MediaQuery.of(context).size.height*0.005),
-                        ElevatedButton(
-                          onPressed: () async {
-                            _storage.deleteAll(aOptions: O.getAndroidOptions());
-                            try {
-                              await FlutterLocker.delete('notes');
-                            }
-                            catch (e) {}
-                            F.snack(context, "Data erased", "top_red");
-                            clear_input();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromARGB(255, 240, 8, 8),
-                          ),
-                          child: const Text('RESET DATA')
-                        ),
-                        SizedBox(height: MediaQuery.of(context).size.height*0.005),
                         Text('OR',style: TextStyle(fontWeight: FontWeight.bold),),
                         SizedBox(height: MediaQuery.of(context).size.height*0.005),
                         Row(
@@ -452,11 +436,27 @@ class _WelcomeState extends State<Welcome> {
                               ],
                             ),
                           )
-                          
                           ],
-                        )
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height*0.04),
+                        ElevatedButton(
+                          onPressed: () async {
+                            _storage.deleteAll(aOptions: O.getAndroidOptions());
+                            try {
+                              await FlutterLocker.delete('notes');
+                            }
+                            catch (e) {}
+                            F.snack(context, "Data erased", "top_red");
+                            clear_input();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromARGB(255, 240, 8, 8),
+                          ),
+                          child: const Text('RESET DATA')
+                        ),
                     ]
                   ),
+                  
                 ],
               )
           )
